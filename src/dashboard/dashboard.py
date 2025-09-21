@@ -1,63 +1,65 @@
-import streamlit as st
 import pandas as pd
+import streamlit as st
 import plotly.express as px
 
-# -------------------------------
-# Load data
-# -------------------------------
-risk_df = pd.read_csv('../../data/user_risk_scores.csv')
-login_df = pd.read_csv('../../data/anomaly_login_summary.csv')
-file_df = pd.read_csv('../../data/anomaly_file_summary.csv')
-usb_df = pd.read_csv('../../data/anomaly_usb_summary.csv')
+# Load risk scores
+df = pd.read_csv('data/insider_risk_data_with_scores.csv')  # Updated file
+
+st.set_page_config(page_title="Insider Risk Dashboard", layout="wide")
+st.title("Insider Risk User Behavior Analytics Dashboard")
 
 # -------------------------------
-# Sidebar filters
+# Assign Risk Levels
 # -------------------------------
-st.sidebar.title("Filters")
-min_risk = st.sidebar.slider("Minimum Risk Score", 0, 100, 0)
-max_risk = st.sidebar.slider("Maximum Risk Score", 0, 100, 100)
+def categorize_risk(score):
+    if score >= 70:
+        return "High"
+    elif score >= 40:
+        return "Medium"
+    else:
+        return "Low"
 
-# Filter users by risk score
-filtered_df = risk_df[(risk_df['risk_score'] >= min_risk) & (risk_df['risk_score'] <= max_risk)]
-
-# -------------------------------
-# Top risky users
-# -------------------------------
-st.title("Insider Risk Dashboard")
-st.header("Top Risky Users")
-top_users = filtered_df.sort_values('risk_score', ascending=False).head(10)
-st.dataframe(top_users[['user_id', 'risk_score', 'login_spike_flag', 'file_spike_flag', 'usb_spike_flag']])
+df['risk_level'] = df['risk_score'].apply(categorize_risk)
 
 # -------------------------------
-# Risk Score Distribution
+# Overall Risk Summary
 # -------------------------------
-st.header("Risk Score Distribution")
-fig_dist = px.histogram(filtered_df, x='risk_score', nbins=20, title="Distribution of User Risk Scores")
-st.plotly_chart(fig_dist)
+st.header("Overall Risk Summary")
+avg_risk = df['risk_score'].mean()
+max_risk = df['risk_score'].max()
+st.metric("Average Risk Score", f"{avg_risk:.2f}")
+st.metric("Maximum Risk Score", f"{max_risk:.2f}")
 
 # -------------------------------
-# Activity Trends (Example: File Access)
+# Top High-Risk Users
 # -------------------------------
-st.header("Activity Trends")
-activity_option = st.selectbox("Select Activity Type", ["Login", "File Access", "USB"])
-
-if activity_option == "Login":
-    df_plot = login_df.groupby('user_id')['total_logins'].sum().reset_index()
-    fig = px.bar(df_plot.sort_values('total_logins', ascending=False).head(20),
-                 x='user_id', y='total_logins', title="Top Users by Login Count")
-elif activity_option == "File Access":
-    df_plot = file_df.groupby('user_id')['total_file_access'].sum().reset_index()
-    fig = px.bar(df_plot.sort_values('total_file_access', ascending=False).head(20),
-                 x='user_id', y='total_file_access', title="Top Users by File Access Count")
-else:
-    df_plot = usb_df.groupby('user_id')['total_usb_events'].sum().reset_index()
-    fig = px.bar(df_plot.sort_values('total_usb_events', ascending=False).head(20),
-                 x='user_id', y='total_usb_events', title="Top Users by USB Events")
-
-st.plotly_chart(fig)
+st.header("Top High-Risk Users")
+top_users = df.sort_values(by='risk_score', ascending=False).head(10)
+st.dataframe(top_users[['user_id', 'risk_score', 'risk_level', 'login_spike_flag', 'file_spike_flag', 'usb_spike_flag']])
 
 # -------------------------------
-# Download Risk Scores
+# Risk Distribution with Colors
 # -------------------------------
-st.header("Download User Risk Scores")
-st.download_button("Download CSV", filtered_df.to_csv(index=False), "user_risk_scores_filtered.csv")
+st.header("Risk Distribution")
+fig_dist = px.histogram(df, x='risk_score', color='risk_level',
+                        color_discrete_map={'Low':'green', 'Medium':'orange', 'High':'red'},
+                        nbins=20, title="Distribution of User Risk Scores")
+st.plotly_chart(fig_dist, use_container_width=True)
+
+# -------------------------------
+# Anomaly Breakdown
+# -------------------------------
+st.header("Anomaly Breakdown")
+anomaly_counts = df[['login_spike_flag', 'file_spike_flag', 'usb_spike_flag']].sum().reset_index()
+anomaly_counts.columns = ['Anomaly Type', 'Count']
+fig_bar = px.bar(anomaly_counts, x='Anomaly Type', y='Count', title="Count of Each Anomaly Type", color='Count',
+                 color_continuous_scale='Viridis')
+st.plotly_chart(fig_bar, use_container_width=True)
+
+# -------------------------------
+# Filter by Risk Score
+# -------------------------------
+st.header("Filter Users by Risk Score")
+risk_threshold = st.slider("Minimum Risk Score", 0, 100, 50)
+filtered_df = df[df['risk_score'] >= risk_threshold]
+st.dataframe(filtered_df[['user_id', 'risk_score', 'risk_level']])
