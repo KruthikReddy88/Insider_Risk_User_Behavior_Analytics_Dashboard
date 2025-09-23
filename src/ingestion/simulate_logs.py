@@ -15,7 +15,7 @@ for _ in range(n_records):
         'success': random.choice([True, False])
     })
 df_login = pd.DataFrame(login_data)
-df_login.to_csv('../../data/raw_login.csv', index=False)
+df_login.to_csv('data/raw_login.csv', index=False)
 
 # ----------------- File-access events -----------------
 file_data = []
@@ -30,7 +30,7 @@ for _ in range(n_records):
         'action': random.choice(actions)
     })
 df_file = pd.DataFrame(file_data)
-df_file.to_csv('../../data/raw_file_access.csv', index=False)
+df_file.to_csv('data/raw_file_access.csv', index=False)
 
 # ----------------- USB usage events -----------------
 usb_data = []
@@ -45,6 +45,6 @@ for _ in range(n_records):
         'action': random.choice(usb_actions)
     })
 df_usb = pd.DataFrame(usb_data)
-df_usb.to_csv('../../data/raw_usb.csv', index=False)
+df_usb.to_csv('data/raw_usb.csv', index=False)
 
 print("Simulated raw datasets created in 'data/' folder.")

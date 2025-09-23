@@ -46,5 +46,5 @@ else:
 # -------------------------------
 # Save risk scores
 # -------------------------------
-df.to_csv('../../data/user_risk_scores.csv', index=False)
+df.to_csv('data/user_risk_scores.csv', index=False)
 print("Risk scoring completed. Results saved to user_risk_scores.csv")

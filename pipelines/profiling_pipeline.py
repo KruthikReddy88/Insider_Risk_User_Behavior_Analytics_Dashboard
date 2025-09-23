@@ -4,7 +4,7 @@ import sqlite3
 # ------------------------------
 # Load Merged Risk Data
 # ------------------------------
-DB_PATH = "C:/Users/Admin/OneDrive/Desktop/Insider_Risk_User_Behavior_Analytics_Dashboard/src/DB/insider_risk.db"
+DB_PATH = "src/DB/insider_risk.db"
 conn = sqlite3.connect(DB_PATH)
 df = pd.read_sql("SELECT * FROM risk_data", conn)
 conn.close()

@@ -7,7 +7,7 @@ import numpy as np
 # ------------------------------
 # Config
 # ------------------------------
-DB_PATH = "../../src/DB/insider_risk.db"
+DB_PATH = "src/DB/insider_risk.db"
 CONTAMINATION = 0.05
 RANDOM_STATE = 42
 

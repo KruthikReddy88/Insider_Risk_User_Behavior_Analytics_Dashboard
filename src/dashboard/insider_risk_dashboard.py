@@ -12,7 +12,7 @@ st.title("🔐 Insider Risk & User Behavior Analytics Dashboard")
 # ------------------------------
 # Load Data from SQLite
 # ------------------------------
-DB_PATH = "C:/Users/Admin/OneDrive/Desktop/Insider_Risk_User_Behavior_Analytics_Dashboard/src/DB/insider_risk.db"
+DB_PATH = "src/DB/insider_risk.db"
 
 @st.cache_data
 def load_data():

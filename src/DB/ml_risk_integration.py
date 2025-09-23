@@ -47,7 +47,7 @@ df_agg['final_risk_score'] = df_agg['final_risk_score'] / df_agg['final_risk_sco
 # ------------------------------
 # Save to SQLite
 # ------------------------------
-conn = sqlite3.connect('C:/Users/Admin/OneDrive/Desktop/Insider_Risk_User_Behavior_Analytics_Dashboard/src/DB/insider_risk.db')
+conn = sqlite3.connect('src/DB/insider_risk.db')
 df_agg.to_sql('risk_data_final', conn, if_exists='replace', index=False)
 conn.close()
 

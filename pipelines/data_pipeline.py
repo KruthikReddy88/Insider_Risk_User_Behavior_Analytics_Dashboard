@@ -4,11 +4,11 @@ import sqlite3
 # ---------------------------
 # File Paths
 # ---------------------------
-CSV_FILE_ACCESS = "C:/Users/Admin/OneDrive/Desktop/Insider_Risk_User_Behavior_Analytics_Dashboard/data/raw_file_access.csv"
-CSV_LOGIN = "C:/Users/Admin/OneDrive/Desktop/Insider_Risk_User_Behavior_Analytics_Dashboard/data/raw_login.csv"
-CSV_USB = "C:/Users/Admin/OneDrive/Desktop/Insider_Risk_User_Behavior_Analytics_Dashboard/data/raw_usb.csv"
+CSV_FILE_ACCESS = "data/raw_file_access.csv"
+CSV_LOGIN = "data/raw_login.csv"
+CSV_USB = "data/raw_usb.csv"
 
-DB_PATH = "C:/Users/Admin/OneDrive/Desktop/Insider_Risk_User_Behavior_Analytics_Dashboard/src/DB/insider_risk.db"
+DB_PATH = "src/DB/insider_risk.db"
 
 # ---------------------------
 # Load CSVs

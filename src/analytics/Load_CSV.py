@@ -1,13 +1,13 @@
 import pandas as pd
 
 # Assuming 'data' folder is at the project root
-df_file = pd.read_csv('../../data/baseline_file_summary.csv')
-df_login = pd.read_csv('../../data/baseline_login_summary.csv')
-df_usb = pd.read_csv('../../data/baseline_usb_summary.csv')
+df_file = pd.read_csv('data/baseline_file_summary.csv')
+df_login = pd.read_csv('data/baseline_login_summary.csv')
+df_usb = pd.read_csv('data/baseline_usb_summary.csv')
 
-hourly_file = pd.read_csv('../../data/hourly_file.csv')
-hourly_login = pd.read_csv('../../data/hourly_login.csv')
-hourly_usb = pd.read_csv('../../data/hourly_usb.csv')
+hourly_file = pd.read_csv('data/hourly_file.csv')
+hourly_login = pd.read_csv('data/hourly_login.csv')
+hourly_usb = pd.read_csv('data/hourly_usb.csv')
 
 # Print columns
 print("Baseline File Summary Columns:", df_file.columns.tolist())

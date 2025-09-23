@@ -1,9 +1,9 @@
 import pandas as pd
 
 # Load preprocessed data
-login_df = pd.read_csv('../../data/preprocessed_login.csv')
-usb_df = pd.read_csv('../../data/preprocessed_usb.csv')
-file_df = pd.read_csv('../../data/preprocessed_file_access.csv')
+login_df = pd.read_csv('data/preprocessed_login.csv')
+usb_df = pd.read_csv('data/preprocessed_usb.csv')
+file_df = pd.read_csv('data/preprocessed_file_access.csv')
 
 # ---------------- Login Summary ----------------
 # Convert timestamp to datetime
@@ -45,13 +45,13 @@ file_df['hour'] = file_df['timestamp'].dt.hour
 hourly_file = file_df.groupby(['user_id', 'hour']).size().reset_index(name='file_count')
 
 # ---------------- Save Summaries ----------------
-login_summary.to_csv('../../data/baseline_login_summary.csv', index=False)
-hourly_login.to_csv('../../data/hourly_login.csv', index=False)
+login_summary.to_csv('data/baseline_login_summary.csv', index=False)
+hourly_login.to_csv('data/hourly_login.csv', index=False)
 
-usb_summary.to_csv('../../data/baseline_usb_summary.csv', index=False)
-hourly_usb.to_csv('../../data/hourly_usb.csv', index=False)
+usb_summary.to_csv('data/baseline_usb_summary.csv', index=False)
+hourly_usb.to_csv('data/hourly_usb.csv', index=False)
 
-file_summary.to_csv('../../data/baseline_file_summary.csv', index=False)
-hourly_file.to_csv('../../data/hourly_file.csv', index=False)
+file_summary.to_csv('data/baseline_file_summary.csv', index=False)
+hourly_file.to_csv('data/hourly_file.csv', index=False)
 
 print("Baseline profiling completed and summaries saved.")
