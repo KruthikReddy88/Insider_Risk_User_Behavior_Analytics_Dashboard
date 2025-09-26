@@ -5,11 +5,8 @@ login_df = pd.read_csv('data/preprocessed_login.csv')
 usb_df = pd.read_csv('data/preprocessed_usb.csv')
 file_df = pd.read_csv('data/preprocessed_file_access.csv')
 
-# ---------------- Login Summary ----------------
-# Convert timestamp to datetime
 login_df['timestamp'] = pd.to_datetime(login_df['timestamp'])
 
-# Aggregate baseline login behaviour per user
 login_summary = login_df.groupby('user_id').agg(
     total_logins=('timestamp', 'count'),
     first_login=('timestamp', 'min'),

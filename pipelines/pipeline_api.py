@@ -24,12 +24,12 @@ import numpy as np
 from datetime import datetime
 
 # ====== CONFIG ======
-CSV_PATH = os.path.join("data", "insider_risk_data_with_scores.csv")  # update if needed
-DB_PATH = os.path.join("src", "DB", "insider_risk.db")                     # update if needed
-ISOLATION_CONTAMINATION = 0.05   # fraction of points assumed anomalies
+CSV_PATH = os.path.join("data", "insider_risk_data_with_scores.csv")
+DB_PATH = os.path.join("src", "DB", "insider_risk.db")
+ISOLATION_CONTAMINATION = 0.05
 RISK_WEIGHT_RULE = 0.7
 RISK_WEIGHT_ML = 0.3
-ACTIVITY_COLS = ['login_spike_flag', 'file_spike_flag', 'usb_spike_flag']   # features for anomaly detection
+ACTIVITY_COLS = ['login_spike_flag', 'file_spike_flag', 'usb_spike_flag']
 
 # ====== PIPELINE FUNCTIONS ======
 def load_csv(csv_path=CSV_PATH):
@@ -39,17 +39,13 @@ def load_csv(csv_path=CSV_PATH):
     return df
 
 def clean_and_preprocess(df: pd.DataFrame) -> pd.DataFrame:
-    # Ensure required columns present; create if missing
     for col in ACTIVITY_COLS:
         if col not in df.columns:
             df[col] = 0
 
-    # Fill numeric missing values with 0
-    num_cols = [c for c in df.columns if df[c].dtype.kind in 'biufc']  # numeric types
+    num_cols = [c for c in df.columns if df[c].dtype.kind in 'biufc']
     df[num_cols] = df[num_cols].fillna(0)
 
-    # Convert timestamp columns if they exist
-    # detect columns that look like timestamp names
     for ts_col in ['timestamp', 'first_login', 'last_login', 'login_time']:
         if ts_col in df.columns:
             try:
@@ -57,18 +53,15 @@ def clean_and_preprocess(df: pd.DataFrame) -> pd.DataFrame:
             except Exception:
                 pass
 
-    # Normalize user_id to string
     if 'user_id' in df.columns:
         df['user_id'] = df['user_id'].astype(str)
     else:
         raise KeyError("CSV must contain 'user_id' column")
 
-    # Ensure risk_score column exists and numeric
     if 'risk_score' not in df.columns:
         df['risk_score'] = 0.0
     df['risk_score'] = pd.to_numeric(df['risk_score'], errors='coerce').fillna(0.0)
 
-    # Ensure hour column if present numeric
     if 'hour' in df.columns:
         df['hour'] = pd.to_numeric(df['hour'], errors='coerce').fillna(-1).astype(int)
     return df
@@ -79,21 +72,17 @@ def store_to_sqlite(df: pd.DataFrame, db_path=DB_PATH, table_name='risk_data'):
     conn.close()
 
 def compute_baseline(df: pd.DataFrame) -> pd.DataFrame:
-    # baseline per user: mean & std for the activity columns
     baseline = df.groupby('user_id')[ACTIVITY_COLS].agg(['mean', 'std'])
     baseline.columns = ['_'.join(col).strip() for col in baseline.columns.values]
     baseline = baseline.reset_index()
-    # fill NaNs in std with 0
     for c in baseline.columns:
         if baseline[c].dtype.kind in 'f' :
             baseline[c] = baseline[c].fillna(0)
     return baseline
 
 def run_isolation_forest(df: pd.DataFrame, contamination=ISOLATION_CONTAMINATION) -> pd.DataFrame:
-    # Use activity cols. If data has very low variance use robust handling.
     X = df[ACTIVITY_COLS].copy().astype(float).fillna(0.0).values
 
-    # If all zeros (or nearly constant), IsolationForest can't learn well; return zeros
     if np.all(np.isclose(X, 0)):
         df['iso_score_raw'] = 0.0
         df['iso_anomaly'] = 0
@@ -101,15 +90,12 @@ def run_isolation_forest(df: pd.DataFrame, contamination=ISOLATION_CONTAMINATION
 
     iso = IsolationForest(n_estimators=200, contamination=contamination, random_state=42)
     iso.fit(X)
-    # decision_function: higher = normal, lower = anomalous
-    df['iso_score_raw'] = iso.decision_function(X)   # continuous score (higher = more normal)
-    iso_pred = iso.predict(X)                        # -1 anomaly, 1 normal
+    df['iso_score_raw'] = iso.decision_function(X)
+    iso_pred = iso.predict(X)                 
     df['iso_anomaly'] = np.where(iso_pred == -1, 1, 0)
     return df
 
 def compute_final_risk(df: pd.DataFrame, w_rule=RISK_WEIGHT_RULE, w_ml=RISK_WEIGHT_ML) -> pd.DataFrame:
-    # Normalize iso_anomaly contribution to same scale as risk_score (assuming risk_score in 0-1 or 0-100).
-    # We check typical scale: if risk_score mostly <= 1, scale iso_anomaly to 1; if risk_score >1, scale iso_anomaly*100.
     risk_median = df['risk_score'].median() if 'risk_score' in df.columns else 0
     if risk_median <= 1:
         ml_contrib = df['iso_anomaly']  # 0 or 1
@@ -117,7 +103,6 @@ def compute_final_risk(df: pd.DataFrame, w_rule=RISK_WEIGHT_RULE, w_ml=RISK_WEIG
         ml_contrib = df['iso_anomaly'] * 100
 
     df['final_risk_score'] = w_rule * df['risk_score'] + w_ml * ml_contrib
-    # Clip to reasonable range (0, 100)
     df['final_risk_score'] = df['final_risk_score'].clip(lower=0)
     return df
 
@@ -133,7 +118,6 @@ def pipeline_run(csv_path=CSV_PATH, db_path=DB_PATH):
     df = run_isolation_forest(df, contamination=ISOLATION_CONTAMINATION)
     df = compute_final_risk(df, w_rule=RISK_WEIGHT_RULE, w_ml=RISK_WEIGHT_ML)
 
-    # Save final table
     store_to_sqlite(df, db_path, table_name='risk_data_final')
     print(f"[{datetime.now()}] Pipeline finished. Tables written to {db_path}: risk_data, baseline, risk_data_final")
     return True
@@ -221,12 +205,10 @@ def summary():
 
 # ====== MAIN ======
 if __name__ == "__main__":
-    # Run pipeline once at startup (comment out if not desired)
     try:
         pipeline_run()
     except Exception as e:
         print("Pipeline initial run produced error:", e)
         print("You can call /run_pipeline after fixing issues.")
 
-    # Start Flask app
     app.run(host="0.0.0.0", port=5001, debug=True)

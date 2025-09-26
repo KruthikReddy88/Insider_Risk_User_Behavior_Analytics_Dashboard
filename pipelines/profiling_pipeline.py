@@ -1,26 +1,16 @@
 import pandas as pd
 import sqlite3
 
-# ------------------------------
-# Load Merged Risk Data
-# ------------------------------
 DB_PATH = "src/DB/insider_risk.db"
 conn = sqlite3.connect(DB_PATH)
 df = pd.read_sql("SELECT * FROM risk_data", conn)
 conn.close()
 
-# ------------------------------
-# Ensure timestamp exists
-# ------------------------------
 if 'timestamp' in df.columns:
     df['timestamp'] = pd.to_datetime(df['timestamp'])
 else:
-    # Create a placeholder column if missing
     df['timestamp'] = pd.NaT
 
-# ------------------------------
-# Initialize baseline metrics dataframe
-# ------------------------------
 users = df['user_id'].unique()
 baseline_list = []
 
@@ -50,7 +40,6 @@ for user in users:
     else:
         usb_inserts = usb_removes = 0
 
-    # Time Metrics (optional: avg activity hour)
     if 'timestamp' in user_df.columns and not user_df['timestamp'].isna().all():
         avg_hour = user_df['timestamp'].dt.hour.mean()
     else:
@@ -70,9 +59,6 @@ for user in users:
 
 baseline_df = pd.DataFrame(baseline_list)
 
-# ------------------------------
-# Save baseline metrics to SQLite
-# ------------------------------
 conn = sqlite3.connect(DB_PATH)
 baseline_df.to_sql('user_baseline_profile', conn, if_exists='replace', index=False)
 conn.close()
