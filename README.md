@@ -147,7 +147,7 @@ Clone the repository:
 
 ```
 git clone https://github.com/KruthikReddy88/Insider_Risk_User_Behavior_Analytics_Dashboard
-cd insider-risk-dashboard
+cd Insider_Risk_User_Behaviour_Analytics_Dashboard
 ```
 
 Install Python dependencies:
