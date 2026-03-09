@@ -234,4 +234,10 @@ Potential extensions include:
 # Author
 
 Kruthik Reddy
-Cyber Security & Web Application Development
+Cyber Security & Web Application Developer
+
+Y Chaitanya Sai
+Cyber Security Analyst
+
+P Prasanth
+Cyber Secuirty Enginner
