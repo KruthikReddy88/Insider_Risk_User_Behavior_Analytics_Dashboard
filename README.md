@@ -147,7 +147,7 @@ Clone the repository:
 
 ```
 git clone https://github.com/KruthikReddy88/Insider_Risk_User_Behavior_Analytics_Dashboard
-cd Insider_Risk_User_Behaviour_Analytics_Dashboard
+cd Insider_Risk_User_Behavior_Analytics_Dashboard
 ```
 
 Install Python dependencies:
@@ -222,7 +222,7 @@ These alerts appear in the **React SOC dashboard** in real time.
 
 # Academic Use
 
-This project was developed as a **B.Tech Capstone Project** to demonstrate:
+This project was developed as a **Final-year B.Tech Project** to demonstrate:
 
 * Insider threat detection
 * User behavior analytics
