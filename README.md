@@ -115,15 +115,27 @@ Insider_Risk_User_Behavior_Analytics_Dashboard
 │   ├── analytics
 │   └── ingestion
 │
+├── data
+│   └── processed/anomaly CSV files
+│
 ├── frontend
 │   └── soc-dashboard
+│       ├── public
+│       └── src
+│
+├── pipelines
+│   ├── risk_pipeline.py
+│   └── pipeline_api.py
 │
 ├── src
 │   ├── DB
-│   └── dashboard
+│   ├── analytics
+│   ├── dashboard
+│   └── ingestion
 │
 ├── requirements.txt
 ├── README.md
+├── System Architecture.png
 └── reset_db.py
 ```
 
@@ -134,7 +146,7 @@ Insider_Risk_User_Behavior_Analytics_Dashboard
 Clone the repository:
 
 ```
-git clone https://github.com/your-username/insider-risk-dashboard.git
+git clone https://github.com/KruthikReddy88/Insider_Risk_User_Behavior_Analytics_Dashboard
 cd insider-risk-dashboard
 ```
 
@@ -233,11 +245,11 @@ Potential extensions include:
 
 # Author
 
-Kruthik Reddy
+Kruthik Reddy - 
 Cyber Security & Web Application Developer
 
-Y Chaitanya Sai
+Y Chaitanya Sai - 
 Cyber Security Analyst
 
-P Prasanth
+P Prasanth - 
 Cyber Secuirty Enginner
