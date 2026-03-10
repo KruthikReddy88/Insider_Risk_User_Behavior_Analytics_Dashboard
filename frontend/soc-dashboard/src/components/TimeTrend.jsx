@@ -1,41 +1,39 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 function TimeTrend({ data = [] }) {
 
-  const [chartData, setChartData] = useState([]);
+  if (!data || data.length === 0) {
+    return <p style={{color:"#888"}}>Waiting for activity...</p>;
+  }
 
-  useEffect(() => {
+  const hourCounts = {};
 
-    const now = new Date().toLocaleTimeString();
+  data.forEach(event => {
 
-    const newPoint = {
-      time: now,
-      events: data.length
-    };
+    const hour = event.hour ?? "Unknown";
 
-    setChartData(prev => {
-      const updated = [...prev, newPoint];
+    hourCounts[hour] = (hourCounts[hour] || 0) + 1;
 
-      if (updated.length > 12) {
-        updated.shift();
-      }
+  });
 
-      return updated;
-    });
+  const chartData = Object.keys(hourCounts).map(h => ({
+    hour: h,
+    events: hourCounts[h]
+  }));
 
-  }, [data]);
+  chartData.sort((a,b)=>a.hour-b.hour);
 
   return (
     <ResponsiveContainer width="100%" height={260}>
       <LineChart data={chartData}>
-        <XAxis dataKey="time"/>
+        <XAxis dataKey="hour"/>
         <YAxis/>
         <Tooltip/>
         <Line
           type="monotone"
           dataKey="events"
-          stroke="rgb(255, 0, 0)"
+          stroke="#ff4d4f"
           strokeWidth={3}
           dot={false}
         />

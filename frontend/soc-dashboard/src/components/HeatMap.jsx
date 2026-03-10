@@ -3,19 +3,23 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recha
 
 function HeatMap({ data = [] }) {
 
+  if (!data || data.length === 0) {
+    return <p style={{color:"#888"}}>Waiting for department data...</p>;
+  }
+
   const deptCounts = {};
 
-  data.forEach(d => {
+  data.forEach(event => {
 
-    const dept = d.department || "Unknown";
+    const dept = event.department || "Unknown";
 
     deptCounts[dept] = (deptCounts[dept] || 0) + 1;
 
   });
 
-  const chartData = Object.keys(deptCounts).map(d => ({
-    department: d,
-    events: deptCounts[d]
+  const chartData = Object.keys(deptCounts).map(dept => ({
+    department: dept,
+    events: deptCounts[dept]
   }));
 
   return (

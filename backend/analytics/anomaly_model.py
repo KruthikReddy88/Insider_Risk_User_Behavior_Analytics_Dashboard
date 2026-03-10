@@ -1,47 +1,49 @@
-import numpy as np
+import pandas as pd
 from sklearn.ensemble import IsolationForest
-import joblib
-
-MODEL_PATH = "./models/anomaly_model.pkl"
-
-def train():
-
-    data = []
-
-    # simulate normal user behaviour
-    for _ in range(300):
-
-        login_count = np.random.randint(3,8)
-        downloads = np.random.randint(0,4)
-        privilege_actions = np.random.randint(0,1)
-        risk_score = np.random.randint(0,30)
-
-        data.append([
-            login_count,
-            downloads,
-            privilege_actions,
-            risk_score
-        ])
-
-    data = np.array(data)
-
-    model = IsolationForest(contamination=0.05)
-
-    model.fit(data)
-
-    joblib.dump(model,MODEL_PATH)
-
-    print("Behavior anomaly model trained")
 
 
-def predict(features):
+class AnomalyDetector:
 
-    model = joblib.load(MODEL_PATH)
+    def __init__(self):
 
-    result = model.predict([features])
+        self.model = IsolationForest(
+            contamination=0.02,
+            random_state=42
+        )
 
-    return result[0] == -1
+        self.trained = False
 
 
-if __name__ == "__main__":
-    train()
+    def train(self, data):
+
+        df = pd.DataFrame(data)
+
+        features = df[[
+            "login_hour",
+            "files_accessed",
+            "usb_size_mb"
+        ]]
+
+        self.model.fit(features)
+
+        self.trained = True
+
+
+    def predict(self, event):
+
+        if not self.trained:
+            return 1, 0
+
+        df = pd.DataFrame([event])
+
+        features = df[[
+            "login_hour",
+            "files_accessed",
+            "usb_size_mb"
+        ]]
+
+        prediction = self.model.predict(features)[0]
+
+        score = self.model.decision_function(features)[0]
+
+        return prediction, score

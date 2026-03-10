@@ -10,30 +10,38 @@ import AnomalySummary from "../components/AnomalySummary";
 function SocDashboard(){
 
  const [data,setData] = useState([]);
+ const [lastUpdate,setLastUpdate] = useState("");
 
  useEffect(()=>{
 
-   const fetchData = () => {
+   const fetchData = async () => {
 
-     axios.get("http://localhost:5000/api/risk-data")
-     .then(res => {
+     try{
+
+       const res = await axios.get("http://localhost:5000/api/risk-data");
 
        if(Array.isArray(res.data)){
          setData(res.data);
-       } else {
+       }else{
          setData([]);
        }
 
-     })
-     .catch(()=>setData([]));
+       setLastUpdate(new Date().toLocaleTimeString());
+
+     }catch(err){
+
+       console.error("API Error:",err);
+       setData([]);
+
+     }
 
    };
 
    fetchData();
 
-   const interval = setInterval(fetchData,3000);
+   const interval = setInterval(fetchData,5000); // refresh every 5 seconds
 
-   return ()=>clearInterval(interval);
+   return () => clearInterval(interval);
 
  },[]);
 
@@ -42,6 +50,8 @@ function SocDashboard(){
 <div className="dashboard">
 
 <h1>🛡 SOC Monitoring Dashboard</h1>
+
+<p style={{color:"#8b949e"}}>Last Updated: {lastUpdate}</p>
 
 <div className="metrics">
  <AnomalySummary/>
